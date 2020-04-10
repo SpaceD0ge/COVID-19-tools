@@ -5,12 +5,15 @@ Prediction models for the current Sberbank competition.
 ## Data sources
 
 [Oxford COVID-19 Government Response Tracker](https://www.bsg.ox.ac.uk/research/research-projects/oxford-covid-19-government-response-tracker)
+
 Stringency ratings for different government responses.
 
 [Google COVID-19 Community Mobility Reports](https://www.google.com/covid19/mobility/)
+
 Mobility trends for different areas and types of places.
 
 [2019-nCoV Data Repository by Johns Hopkins CSSE](https://github.com/CSSEGISandData/COVID-19/)
+
 Tracking cases by country.
 
 ## Requirements
@@ -47,6 +50,8 @@ Do not unnecessarily overload the public servers though.
 	python -m pytest .
 
 # Coming next
-[ ] New data sources
-[ ] Prediction models
-[ ] Online dashboard
+New data sources
+
+Prediction models
+
+Online dashboard
