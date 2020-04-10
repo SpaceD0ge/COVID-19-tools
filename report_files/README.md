@@ -1,0 +1,1 @@
+An empty directory to store the reports.
