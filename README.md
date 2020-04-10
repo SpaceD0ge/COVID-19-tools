@@ -1,6 +1,8 @@
 # Tools for the COVID-19 information processing.
 Prediction models for the current Sberbank competition.
 
+[![CodeFactor](https://www.codefactor.io/repository/github/spaced0ge/covid-19-tools/badge)](https://www.codefactor.io/repository/github/spaced0ge/covid-19-tools)
+[![Build Status](https://travis-ci.com/SpaceD0ge/competition.svg?branch=master)](https://travis-ci.com/SpaceD0ge/competition)
 
 ## Data sources
 
