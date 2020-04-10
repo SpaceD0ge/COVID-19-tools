@@ -37,7 +37,7 @@ class XrefStreamParser:
         basex, basey = raw_data[-1]
         if basex == 0.0:
             data = basey - raw_data[:, 1]
-            data = np.trim_zeros(data)
+            data = np.trim_zeros(data, "f")
         else:
             data = raw_data[:, 1]
         return data[::-1]
@@ -51,15 +51,32 @@ class XrefStreamParser:
         return self.parse_xref(xref)
 
 
-class DocumentParser:
+class CoordinateParser:
     """
-    Reads a pdf file by its filepath to stream the contents into a
-    readable coordinate format.
+    Coordinate parser for proper coordinate extraction.
+    Each graph can end up being incomplete or broken. CoordinateParser evens
+    out each sequences shape and fills missing data with np.nan.
     """
 
-    def __init__(self, convention="alpha_2"):
-        self.convention = convention
+    def __init__(self):
         self.xref_parser = XrefStreamParser()
+
+    def _fix_coordinates(self, coordinates):
+        coordinate_range = len(coordinates[0])
+        for index in range(1, len(coordinates)):
+            if coordinates[index][0] != 0 or len(coordinates[index]) > coordinate_range:
+                coordinates[index] = [np.nan for _ in range(coordinate_range)]
+            elif len(coordinates[index]) < coordinate_range:
+                coordinates[index] = np.concatenate(
+                    [
+                        coordinates[index],
+                        [
+                            np.nan
+                            for _ in range(coordinate_range - len(coordinates[index]))
+                        ],
+                    ]
+                )
+        return coordinates
 
     def _collect_raw_coordinates(self, doc):
         """
@@ -76,8 +93,7 @@ class DocumentParser:
                 stream = doc.xrefStream(xref[0]).decode()
                 raw_graph_points = self.xref_parser(stream)
                 coordinates.append(raw_graph_points)
-        if len(set([len(x) for x in coordinates])) != 1:
-            return None
+        coordinates = self._fix_coordinates(coordinates)
         return coordinates
 
     def _get_reference_points(self, doc):
@@ -97,6 +113,31 @@ class DocumentParser:
                     percentage_value = int(percentage_text[:-1])
                     references.append(percentage_value)
         return references
+
+    def get_graph_coordinates(self, doc):
+        coordinates = self._collect_raw_coordinates(doc)
+        references = self._get_reference_points(doc)
+        if references is None:
+            return None
+        assert len(coordinates) == len(references)
+        for index in range(len(coordinates)):
+            nan_mask = ~np.isnan(coordinates[index])
+            if True in nan_mask:
+                coordinates[index][nan_mask] *= abs(
+                    references[index] / coordinates[index][nan_mask][-1]
+                )
+        return coordinates
+
+
+class DocumentParser:
+    """
+    Reads a pdf file by its filepath to stream the contents into a
+    readable coordinate format.
+    """
+
+    def __init__(self, convention="alpha2"):
+        self.convention = convention
+        self.coordinate_parser = CoordinateParser()
 
     def _get_country_name(self, doc, country_code):
         """
@@ -122,16 +163,8 @@ class DocumentParser:
         """
         document = fitz.Document(filepath)
         name = self._get_country_name(document, country_code)
-        coordinates = self._collect_raw_coordinates(document)
-        references = self._get_reference_points(document)
-        if references is None or coordinates is None:
-            return name, None
-        assert len(coordinates) == len(references)
-        parsed_data = [
-            coordinates[index] * abs(references[index] / coordinates[index][-1])
-            for index in range(len(references))
-        ]
-        return name, parsed_data
+        coordinates = self.coordinate_parser.get_graph_coordinates(document)
+        return name, coordinates
 
     def __call__(self, filepath, country_code=None):
         return self.parse_document(filepath, country_code)

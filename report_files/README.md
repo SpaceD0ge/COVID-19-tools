@@ -1,1 +1,1 @@
-An empty directory to store the reports.
+An empty directory to store the reports. Contains example data by default.

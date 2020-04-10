@@ -19,7 +19,33 @@ Tracking cases by country.
 ## Requirements
 
 python 3.5+
+
 internet access
+
+## Getting started
+
+Combine all data in one dictionary with two dataframes:
+```python
+from data import DatasetManager
+import yaml
+
+with open('file_cfg.yml') as f:
+    cfg = yaml.load(f)
+
+data = DatasetManager(cfg).get_data()
+assert(list(data.keys()) == ['by_country', 'by_date'])
+```
+
+Or get reports separately:
+```python
+from data import GoogleParser, CSSEParser, OxfordParser
+parsers = [
+	GoogleParser(cfg['google']),
+	CSSEParser(cfg['csse']),
+	OxfordParser(cfg['oxford'])
+]
+data = [parser.load_data() for parser in parsers]
+```
 
 ## Configuration format
 

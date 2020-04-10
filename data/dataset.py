@@ -47,7 +47,7 @@ class Convention:
             report.loc[:, "country_code"] = report["country_code"].apply(
                 lambda x: self._convert_code(x, report_convention)
             )
-        return report
+        return report[report["country_code"].notna()]
 
 
 class DateLevelStatCollector:
@@ -65,13 +65,13 @@ class DateLevelStatCollector:
         joint_report = None
         for report_index in range(len(reports) - 1):
             left_report = (
-                reports[report_index].dropna() if joint_report is None else joint_report
+                reports[report_index] if joint_report is None else joint_report
             )
             right_report = reports[report_index + 1]
 
             joint_report = pd.merge(
                 left_report,
-                right_report.dropna(),
+                right_report,
                 how="left",
                 left_on=["date", "country_code"],
                 right_on=["date", "country_code"],
@@ -111,7 +111,5 @@ class DatasetManager:
             "by_country": self._load(
                 f"{self.root}/country_level_data.csv", self.country_parser
             ),
-            "by_date": self._load(
-                f"{self.root}/date_level_data.csv", self.date_parser
-            ),
+            "by_date": self._load(f"{self.root}/date_level_data.csv", self.date_parser),
         }
