@@ -1,8 +1,8 @@
 # Tools for the COVID-19 information processing.
-Prediction models for the current Sberbank competition.
+Simple up to data retrieval tools.
 
 [![CodeFactor](https://www.codefactor.io/repository/github/spaced0ge/covid-19-tools/badge)](https://www.codefactor.io/repository/github/spaced0ge/covid-19-tools)
-[![Build Status](https://travis-ci.com/SpaceD0ge/competition.svg?branch=master)](https://travis-ci.com/SpaceD0ge/competition)
+[![Build Status](https://travis-ci.com/SpaceD0ge/COVID-19-tools.svg?branch=master)](https://travis-ci.com/SpaceD0ge/COVID-19-tools)
 
 ## Data sources
 
@@ -56,7 +56,7 @@ Each of the main data parsers should have a root folder. Set to "./report_files"
  
 	root: ./report_files
 
-This competition follows the "iso_alpha3" naming convention. The "countries.csv" file holds some additional information.
+Default naming convention is "iso_alpha3" (3-letter country code). The "countries.csv" file holds some additional information.
 
 	convention: iso_alpha3
 	countries: ./countries.csv

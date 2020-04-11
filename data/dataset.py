@@ -103,7 +103,7 @@ class DatasetManager:
             dataframe = pd.read_csv(filename)
         else:
             dataframe = parser.collect_dataframe()
-            dataframe.to_csv(filename)
+            dataframe.to_csv(filename, index=False)
         return dataframe
 
     def get_data(self):

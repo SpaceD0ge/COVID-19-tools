@@ -9,6 +9,7 @@ def config():
     print("loading config")
     with open("./file_cfg.yml") as f:
         config = yaml.load(f)
+    config['reload'] = True
     return config
 
 
