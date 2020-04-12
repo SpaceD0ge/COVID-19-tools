@@ -1,5 +1,5 @@
 # Tools for the COVID-19 information processing.
-Simple up to data retrieval tools.
+Simple up to date data retrieval tools.
 
 [![CodeFactor](https://www.codefactor.io/repository/github/spaced0ge/covid-19-tools/badge)](https://www.codefactor.io/repository/github/spaced0ge/covid-19-tools)
 [![Build Status](https://travis-ci.com/SpaceD0ge/COVID-19-tools.svg?branch=master)](https://travis-ci.com/SpaceD0ge/COVID-19-tools)
