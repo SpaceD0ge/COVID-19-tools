@@ -2,3 +2,4 @@ pymupdf
 pandas
 PyYAML
 requests
+plotly

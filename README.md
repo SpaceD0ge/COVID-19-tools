@@ -5,18 +5,11 @@ Simple up to date data retrieval tools.
 [![Build Status](https://travis-ci.com/SpaceD0ge/COVID-19-tools.svg?branch=master)](https://travis-ci.com/SpaceD0ge/COVID-19-tools)
 
 ## Data sources
-
-[Oxford COVID-19 Government Response Tracker](https://www.bsg.ox.ac.uk/research/research-projects/oxford-covid-19-government-response-tracker)
-
-Stringency ratings for different government responses.
-
-[Google COVID-19 Community Mobility Reports](https://www.google.com/covid19/mobility/)
-
-Mobility trends for different areas and types of places.
-
-[2019-nCoV Data Repository by Johns Hopkins CSSE](https://github.com/CSSEGISandData/COVID-19/)
-
-Tracking cases by country.
+| Source | Description |
+| --- | --- |
+| [Oxford COVID-19 Government Response Tracker](https://www.bsg.ox.ac.uk/research/research-projects/oxford-covid-19-government-response-tracker) | Stringency ratings for different government responses. |
+| [Google COVID-19 Community Mobility Reports](https://www.google.com/covid19/mobility/) | Mobility trends for different areas and types of places. |
+| [2019-nCoV Data Repository by Johns Hopkins CSSE](https://github.com/CSSEGISandData/COVID-19/) | Tracking cases by country. |
 
 ## Requirements
 
@@ -34,6 +27,10 @@ import yaml
 with open('file_cfg.yml') as f:
     cfg = yaml.load(f)
 
+# to get up to date data from online sources each time
+# uncomment the next part:
+# cfg['reload'] = True
+
 data = DatasetManager(cfg).get_data()
 assert(list(data.keys()) == ['by_country', 'by_date'])
 ```
@@ -48,6 +45,19 @@ parsers = [
 ]
 data = [parser.load_data() for parser in parsers]
 ```
+
+Train a SEIR model approximation per country:
+```python
+from models import CompartmentalOptimizer
+
+optimizer = CompartmentalOptimizer(optim_days=14)
+result = optimizer.fit(cases, deaths, population)
+```
+
+or follow examples from the
+
+	examples
+folder
 
 ## Configuration format
 
