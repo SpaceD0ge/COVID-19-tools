@@ -1,9 +1,9 @@
 import plotly.graph_objects as go
-import plotly.offline as py
+from IPython.display import Image
 from datetime import datetime, timedelta
 
 
-def graph_SEIR(code, opt_result, start_date, data_key='cases', plot=True):
+def graph_SEIR(code, opt_result, start_date, data_key='cases', static=False):
     fig = go.Figure()
     start_date = datetime.strptime(start_date, "%Y-%m-%d")
     graph_dates = [
@@ -39,13 +39,14 @@ def graph_SEIR(code, opt_result, start_date, data_key='cases', plot=True):
         height=350,
         margin=dict(l=50, r=50, b=50, t=50, pad=4),
     )
-    if plot:
-        py.iplot(fig)
+    if static:
+        img_bytes = img_bytes = fig.to_image(format="png")
+        return Image(img_bytes)
     else:
         return fig
 
 
-def graph_Rt(code, opt_result, start_date, period=60, plot=True):
+def graph_Rt(code, opt_result, start_date, period=60, static=False):
     start_date = datetime.strptime(start_date, "%Y-%m-%d")
     graph_dates = [start_date + timedelta(days=x) for x in range(period)]
     graph_dates = [x.strftime("%Y-%m-%d") for x in graph_dates]
@@ -75,7 +76,8 @@ def graph_Rt(code, opt_result, start_date, period=60, plot=True):
         margin=dict(l=50, r=50, b=50, t=50, pad=4),
     )
 
-    if plot:
-        py.iplot(fig)
+    if static:
+        img_bytes = img_bytes = fig.to_image(format="png")
+        return Image(img_bytes)
     else:
         return fig

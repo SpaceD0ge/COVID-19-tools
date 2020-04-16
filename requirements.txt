@@ -4,3 +4,4 @@ PyYAML
 requests
 plotly
 scipy
+sklearn
