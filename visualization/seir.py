@@ -3,7 +3,7 @@ from IPython.display import Image
 from datetime import datetime, timedelta
 
 
-def graph_SEIR(code, opt_result, start_date, data_key='cases', static=False):
+def graph_SEIR(code, opt_result, start_date, data_key="cases", static=False):
     fig = go.Figure()
     start_date = datetime.strptime(start_date, "%Y-%m-%d")
     graph_dates = [

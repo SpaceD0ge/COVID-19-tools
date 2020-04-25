@@ -191,15 +191,15 @@ class ReportDownloader:
         Reads the main country list from the main Google report page.
         Returns a tuple of (latest_date, codes)
         """
-        main_paige = requests.get(self.main_page_url)
-        if main_paige.status_code != 200:
+        main_page = requests.get(self.main_page_url)
+        if main_page.status_code != 200:
             raise ValueError(f"Wrong response code for {self.main_page_url}")
         code_pattern = "[A-Z]{2}"
         date_pattern = "[0-9]{4}-[0-9]{2}-[0-9]{2}"
         reports = set(
             re.findall(
                 f"{self.link_start}{date_pattern}_{code_pattern}{self.link_end}",
-                main_paige.content.decode(),
+                main_page.content.decode(),
             )
         )
         # 10 characters for a date string of format 1234-56-78

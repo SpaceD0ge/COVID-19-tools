@@ -78,7 +78,7 @@ class CompartmentalModel:
             (population - n_infected) / population,
             0,
             n_infected / population,
-            0,0,0,0
+            0,0,0,0,
         ]
 
         solution = solve_ivp(
@@ -96,7 +96,9 @@ class CompartmentalModel:
         args = self._get_optimization_args(params)
         max_days = len(data_cases) + forecast_days
         sol = self._solve_ode(args, population, data_cases[0], max_days)
-        msle_score, predicted = self._eval_msle(sol, data_cases, data_deaths, population)
+        msle_score, predicted = self._eval_msle(
+            sol, data_cases, data_deaths, population
+        )
 
         if forecast_days == 0:
             return msle_score

@@ -2,6 +2,7 @@ pymupdf
 pandas
 PyYAML
 requests
-plotly
 scipy
 sklearn
+beautifulsoup4
+plotly==4.6.0

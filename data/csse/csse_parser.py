@@ -10,10 +10,10 @@ class ReportDownloader:
         self.cfg = file_cfg
 
     def _download_report(self, link):
-        paige = requests.get(link)
-        if paige.status_code != 200:
+        page = requests.get(link)
+        if page.status_code != 200:
             raise ValueError(f"Wrong response code for {link}")
-        data = paige.content.decode()
+        data = page.content.decode()
         filename = self.cfg["root"] + "/" + link.split("/")[-1]
         if not os.path.exists(filename) or self.cfg["rewrite"]:
             with open(filename, "w") as f:

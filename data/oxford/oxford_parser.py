@@ -10,10 +10,10 @@ class ReportDownloader:
         self.root = file_cfg["root"]
 
     def download_report(self):
-        main_paige = requests.get(self.main_page_url)
-        if main_paige.status_code != 200:
+        main_page = requests.get(self.main_page_url)
+        if main_page.status_code != 200:
             raise ValueError(f"Wrong response code for {self.main_page_url}")
-        data = main_paige.content.decode()
+        data = main_page.content.decode()
         filename = f"{self.root}/oxford_report.csv"
         if not os.path.exists(filename) or self.rewrite:
             with open(filename, "w") as f:

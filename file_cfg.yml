@@ -1,7 +1,19 @@
-convention: iso_alpha3
-countries: ./countries.csv
 root: ./report_files
 reload: false
+auxiliary:
+  {
+    convention: iso_alpha3,
+    countries: ./auxiliary_files/countries.csv,
+    regions: ./auxiliary_files/russia_regions.csv,
+    geojson: ./auxiliary_files/gadm36_RUS_1.json,
+  }
+rospotreb:
+  {
+    rospotreb_page: 'https://www.rospotrebnadzor.ru/',
+    timeseries_page: 'https://github.com/grwlf/COVID-19_plus_Russia/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_RU.csv',
+    rewrite: true,
+    root: ./report_files
+  }
 csse: 
   {
     global_confirmed: 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',

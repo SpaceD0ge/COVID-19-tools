@@ -1,13 +1,14 @@
-from .google_mobility_report import CountryReportParser
 from .oxford import OxfordParser
 from .csse import CSSEParser
+from .rospotrebnadzor import RussianRegionsParser
 import pandas as pd
 import os
 
 
 class Convention:
-    def __init__(self, country_code_file, convention_code="iso_alpha3"):
-        self.convention = convention_code
+    def __init__(self, cfg):
+        country_code_file = cfg["countries"]
+        self.convention = cfg["convention"]
         conventions = set(
             [
                 "iso_alpha2",
@@ -52,11 +53,10 @@ class Convention:
 
 class DateLevelStatCollector:
     def __init__(self, cfg):
-        self.convention = Convention(cfg["countries"], cfg["convention"])
+        self.convention = Convention(cfg["auxiliary"])
         csse_parser = CSSEParser(cfg["csse"])
-        google_parser = CountryReportParser(cfg["google"])
         oxford_parser = OxfordParser(cfg["oxford"])
-        self.parsers = [csse_parser, google_parser, oxford_parser]
+        self.parsers = [csse_parser, oxford_parser]
 
     def collect_dataframe(self):
         reports = [parser.load_data() for parser in self.parsers]
@@ -82,13 +82,29 @@ class DateLevelStatCollector:
 
 class CountryLevelStatCollector:
     def __init__(self, cfg):
-        self.country_file = cfg["countries"]
-        self.convention = cfg["convention"]
+        self.country_file = cfg["auxiliary"]["countries"]
+        self.convention = cfg["auxiliary"]["convention"]
 
     def collect_dataframe(self):
         data = pd.read_csv(self.country_file)
         new_columns = [self.convention] + list(data.columns)[6:]
         return data[new_columns].rename(columns={"iso_alpha3": "country_code"})
+
+
+class RegionLevelStatCollector:
+    def __init__(self, cfg):
+        self.rosparser = RussianRegionsParser(cfg["rospotreb"], cfg["auxiliary"])
+        self.report = None
+
+    def preload(self):
+        if self.report is None:
+            self.report, self.updated_region_data = self.rosparser.load_data()
+
+    def collect_dataframe(self, part_id):
+        self.preload()
+        if part_id == "timeseries":
+            return self.updated_region_data
+        return self.report
 
 
 class DatasetManager:
@@ -97,19 +113,31 @@ class DatasetManager:
         self.reload = cfg["reload"]
         self.country_parser = CountryLevelStatCollector(cfg)
         self.date_parser = DateLevelStatCollector(cfg)
+        self.region_parser = RegionLevelStatCollector(cfg)
 
-    def _load(self, filename, parser):
+    def _load(self, filename, parser, **args):
         if os.path.exists(filename) and self.reload is False:
-            dataframe = pd.read_csv(filename)
+            dataframe = pd.read_csv(filename, index_col=0)
         else:
-            dataframe = parser.collect_dataframe()
-            dataframe.to_csv(filename, index=False)
+            dataframe = parser.collect_dataframe(**args)
+            dataframe.to_csv(filename)
         return dataframe
 
     def get_data(self):
+        wold_countries = self._load(
+            f"{self.root}/country_level_data.csv", self.country_parser
+        )
+        world_timeseries = self._load(
+            f"{self.root}/date_level_data.csv", self.date_parser
+        )
+        russia_regions = self._load(
+            f"{self.root}/rus_regions.csv", self.region_parser, part_id="timeseries"
+        )
+        russia_timeseries = self._load(
+            f"{self.root}/rus_confirmed_cases.csv", self.region_parser, part_id="info"
+        )
+
         return {
-            "by_country": self._load(
-                f"{self.root}/country_level_data.csv", self.country_parser
-            ),
-            "by_date": self._load(f"{self.root}/date_level_data.csv", self.date_parser),
+            "world": {"by_country": wold_countries, "by_date": world_timeseries},
+            "russia": {"by_region": russia_regions, "by_date": russia_timeseries},
         }

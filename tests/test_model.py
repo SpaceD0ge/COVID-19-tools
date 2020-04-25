@@ -88,8 +88,6 @@ class Test_model:
 
     def test_splits(self, date_data):
         codes = set(date_data.index.unique())
-        splits = model_per_country_simple_split(
-            date_data, targets=["cases", "deaths"]
-        )
+        splits = model_per_country_simple_split(date_data, targets=["cases", "deaths"])
         country_codes_alpha3 = set([x for x, y in splits])
         assert codes == country_codes_alpha3
