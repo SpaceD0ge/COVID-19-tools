@@ -163,16 +163,17 @@ class RussianRegionsParser:
             lambda x: original.loc[x, "region_name"][0]
         )
         update.set_index("region", inplace=True)
+        original_prev = original.query(f'date == "{date}"')
         update["confirmed"] = (
-            original.query(f'date == "{date}"')["confirmed"] + update["confirmed"]
+            original_prev["confirmed"] + update["confirmed"]
         )
         # fill missing values
         for region_code in original.index.unique():
             if region_code not in update.index:
                 update.loc[region_code] = [
-                    original.loc[region_code, 'confirmed'],
+                    original_prev.loc[region_code, 'confirmed'],
                     update["date"][0],
-                    original.loc[region_code, 'region_name']
+                    original_prev.loc[region_code, 'region_name']
                 ]
         return original.append(update).sort_values(by=["region", "date"])
 
