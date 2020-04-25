@@ -144,7 +144,7 @@ class CustomOverviewGraph:
         fig.add_trace(self.get_pop_map(data, dates[0]), 1, 2)
 
         if len(dates) > 0:
-            self.animate(fig, data, key, dates[1:])
+            self.animate(fig, data, key, dates)
 
         self.fix_axis(fig)
         self.fix_style(fig)

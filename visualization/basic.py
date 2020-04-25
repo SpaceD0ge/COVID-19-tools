@@ -60,7 +60,7 @@ def plot_cases_map(data, geojson, date=None, key="confirmed", log_scale=False):
     postfix = "Log scale" if log_scale else ""
     title = f"Confirmed cases by region. {postfix}"
 
-    return plot_map(local_data, geodata, title, key, px.colors.sequential.tempo,)
+    return plot_map(local_data, geojson, title, key, px.colors.sequential.tempo,)
 
 
 def plot_region_dynamic(data, region_code, key="confirmed"):
@@ -71,12 +71,8 @@ def plot_region_dynamic(data, region_code, key="confirmed"):
             go.Scatter(x=bar_data["date"], y=bar_data[key].diff(), name="by day"),
         ]
     )
-    title = "Confirmed cases dynamic for {region_code}, {data.loc[region_code, 'region_name']}"
-    fig.update_layout(
-        annotations=[
-            dict(text=title, showarrow=False, xref="paper", yref="paper", x=0, y=1)
-        ]
-    )
+    title = f"Confirmed cases dynamic for {region_code}, {data.loc[region_code, 'region_name'].values[0]}"
+    fig.update_layout(title=title)
     fig.show()
 
 
@@ -111,7 +107,7 @@ def plot_simple_difference(
 def plot_map_difference(scores, geodata, by_source=False):
     agg = scores.reset_index().groupby("geoname_code").mean()
     if by_source:
-        agg["best"] = agg.apply(lambda x: np.argmax(x), 1)
+        agg["best"] = agg.apply(lambda x: np.argmin(x), 1)
         agg.reset_index(inplace=True)
         key = "best"
         animation = None
