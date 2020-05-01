@@ -6,16 +6,16 @@ import numpy as np
 
 
 DEFAULT_STATES = {
-    "R_0": [3.6, (1, 4)],
-    "time_incubation": [5, (2, 10)],
-    "time_infectious": [2, (1.5, 16)],
-    "time_in_hospital": [4, (2, 10)],
-    "time_critical": [10, (1, 20)],
-    "mild_fraction": [0.8, (0.6, 0.95)],
-    "critical_fraction": [0.1, (0.05, 0.65)],
-    "fatal_fraction": [0.2, (0.01, 0.65)],
-    "k": [2, (1, 10)],
-    "L": [50, (1, 200)],
+    "R_0": [2, (1, 4)],
+    "time_incubation": [2, (2, 10)],
+    "time_infectious": [1.5, (1.5, 16)],
+    "time_in_hospital": [2, (2, 10)],
+    "time_critical": [1, (1, 20)],
+    "mild_fraction": [0, (0, 0.95)],
+    "critical_fraction": [0, (0.05, 0.65)],
+    "fatal_fraction": [0, (0.01, 0.65)],
+    "k": [2, (1, 100)],
+    "L": [2, (1, 200)],
 }
 
 
@@ -78,10 +78,7 @@ class CompartmentalModel:
             (population - n_infected) / population,
             0,
             n_infected / population,
-            0,
-            0,
-            0,
-            0,
+            0, 0, 0, 0,
         ]
 
         solution = solve_ivp(

@@ -14,7 +14,7 @@ class CSSEParser:
         ]
 
     def _compose(self, frames):
-        frames = [frame.groupby("Country/Region").sum() for frame in frames]
+        frames = [frame.drop(['Lat', 'Long'], 1).groupby("Country/Region").sum() for frame in frames]
         assert frames[0].shape == frames[1].shape == frames[2].shape
         raw_data = np.stack([frame.values for frame in frames], -1)
         return frames[0].index, frames[0].columns[2:], raw_data
