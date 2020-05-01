@@ -1,0 +1,36 @@
+# Archive files
+*.zip
+*.tar.gz
+*.tar
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# Python
+__pycache__/
+*.pyc
+
+# macOS
+.DS_Store
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+msbuild.log
+msbuild.err
+msbuild.wrn
+msbuild.binlog
+.vs/
+

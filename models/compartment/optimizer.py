@@ -78,7 +78,10 @@ class CompartmentalModel:
             (population - n_infected) / population,
             0,
             n_infected / population,
-            0,0,0,0,
+            0,
+            0,
+            0,
+            0,
         ]
 
         solution = solve_ivp(

@@ -4,52 +4,75 @@ import numpy as np
 
 
 def plot_map(
-    data,
-    geodata,
-    title,
-    color_key,
+    data, title, color_key,
     color_scale,
-    map_style="carto-positron",
+    geodata=None,
     hover_name=None,
     animation_frame=None,
+    center={"lat": 61.5, "lon": 105},
+    map_style="carto-positron",
+    map_class="choropleth",
 ):
-    fig = px.choropleth_mapbox(
+    if map_class == "choropleth":
+        map_figure = px.choropleth
+    elif map_class == "choropleth_mapbox" or map_class == "mapbox":
+        map_figure = px.choropleth_mapbox
+    else:
+        raise ValueError(f"Wrong map type {map_class}")
+    fig = map_figure(
         data,
         geojson=geodata,
         locations="geoname_code",
         featureidkey="properties.HASC_1",
         color=color_key,
         animation_frame=animation_frame,
-        range_color=[data[color_key].min(), data[color_key].max() * 1.2],
+        range_color=[data[color_key].min(), data[color_key].max() * 1.3],
         hover_name=hover_name,
         hover_data=[color_key],
-        center={"lat": 61.5, "lon": 105},
+        center=center,
         color_continuous_scale=color_scale,
     )
 
     fig.update_layout(
-        mapbox_style=map_style, mapbox_zoom=1, mapbox_center={"lat": 61.5, "lon": 105},
+        mapbox_style=map_style, mapbox_zoom=1, mapbox_center=center,
     )
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
 
     fig.update_layout(
         annotations=[
-            dict(text=title, showarrow=False, xref="paper", yref="paper", x=0, y=1)
+            dict(text=title, showarrow=False, xref="paper", yref="paper", x=0, y=1.00)
         ]
     )
     return fig
 
 
-def plot_country_dynamic(data, key="confirmed"):
-    fig = px.line(
-        data.query('date > "2020-03-06"'), x="date", y=key, color="region_name"
-    )
+def plot_country_dynamic(
+    data, start="2020-03-06", key="confirmed", group="region_name", clip=None
+):
+    if start:
+        data = data.query(f'date > "{start}"')
+    if clip:
+        date = data["date"].max()
+        selected = data[data["date"] == date].sort_values(by="cases")[-clip:][group]
+        data = data.set_index(group).loc[selected].reset_index()
+    fig = px.line(data, x="date", y=key, color=group)
     fig.update_layout(yaxis_type="log")
     fig.update_layout(dict(title="Country dynamics for confirmed cases"))
-    fig.show()
+    return fig
 
 
-def plot_cases_map(data, geojson, date=None, key="confirmed", log_scale=False):
+def plot_cases_map(
+    data,
+    geojson=None,
+    key="confirmed",
+    group="geoname_code",
+    log_scale=False,
+    mtype="choropleth",
+    center=None,
+    date=None,
+):
+    data["geoname_code"] = data[group]
+
     if date is None:
         date = data["date"].max()
     local_data = data.query(f'date == "{date}"').copy()
@@ -58,22 +81,28 @@ def plot_cases_map(data, geojson, date=None, key="confirmed", log_scale=False):
         key = "log_values"
 
     postfix = "Log scale" if log_scale else ""
-    title = f"Confirmed cases by region. {postfix}"
+    title = f"Confirmed cases by region by {date}. {postfix}"
 
-    return plot_map(local_data, geojson, title, key, px.colors.sequential.tempo,)
+    return plot_map(
+        local_data, title, key,
+        px.colors.sequential.tempo,
+        geodata=geojson,
+        map_class=mtype,
+        center=center,
+    )
 
 
-def plot_region_dynamic(data, region_code, key="confirmed"):
-    bar_data = data.loc[region_code].query(f"{key} > 0")
+def plot_region_dynamic(data, region_code, key="confirmed", group="region_name"):
+    bar_data = data.set_index(group).loc[region_code].query(f"{key} > 5")
     fig = go.Figure(
         [
             go.Bar(x=bar_data["date"], y=bar_data[key], name="cumulative"),
             go.Scatter(x=bar_data["date"], y=bar_data[key].diff(), name="by day"),
         ]
     )
-    title = f"Confirmed cases dynamic for {region_code}, {data.loc[region_code, 'region_name'].values[0]}"
+    title = f"Confirmed cases dynamic for {region_code}"
     fig.update_layout(title=title)
-    fig.show()
+    return fig
 
 
 def plot_simple_difference(
@@ -104,7 +133,16 @@ def plot_simple_difference(
         raise ValueError(f"Wrong graph type {graph_type}")
 
 
-def plot_map_difference(scores, geodata, by_source=False):
+def plot_map_difference(
+    scores,
+    geojson,
+    group="geoname_code",
+    by_source=False,
+    mtype="choropleth",
+    center=None,
+):
+    data["geoname_code"] = data[group]
+
     agg = scores.reset_index().groupby("geoname_code").mean()
     if by_source:
         agg["best"] = agg.apply(lambda x: np.argmin(x), 1)
@@ -122,7 +160,14 @@ def plot_map_difference(scores, geodata, by_source=False):
         title = "Comparing different predictions by region error values"
         scale = px.colors.sequential.Reds
 
-    fig = plot_map(agg, geodata, title, key, scale, animation_frame=animation)
+    fig = plot_map(
+        agg, title, key,
+        scale,
+        animation_frame=animation,
+        geodata=geojson,
+        map_class=mtype,
+        center=center,
+    )
 
     if not by_source:
         fig.update_layout(coloraxis={"cmax": agg.error.max(), "cmin": agg.error.min()})

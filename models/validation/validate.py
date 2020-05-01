@@ -43,8 +43,9 @@ def get_validation_results(predictions, test_source, start, end, df):
         end = ending date in format "%Y-%m-%d"
         df = russian regions information dataframe
     """
-    for preds_idx in range(len(predictions)):
-        preds = predictions[preds_idx]
+    fixed_predictions = []
+    for prediction_df in predictions:
+        preds = prediction_df.copy()
         preds["geoname_code"] = preds["region"].apply(
             lambda x: df.loc[x, "geoname_code"]
         )
@@ -54,7 +55,7 @@ def get_validation_results(predictions, test_source, start, end, df):
         preds = preds.query(f'date >= "{start}" & date <= "{end}"').set_index(
             ["region", "date"]
         )
-        predictions[preds_idx] = preds
+        fixed_predictions.append(preds)
 
     test_source["date"] = pd.to_datetime(test_source.date).dt.strftime("%Y-%m-%d")
     true_values = (
@@ -63,6 +64,8 @@ def get_validation_results(predictions, test_source, start, end, df):
         .set_index(["region", "date"])
     )
 
-    scores = pd.concat([collect_scores(true_values, preds) for preds in predictions], 1)
+    scores = pd.concat(
+        [collect_scores(true_values, preds) for preds in fixed_predictions], 1
+    )
     scores.columns = [f"source_{x}" for x in range(len(scores.columns))]
     return scores

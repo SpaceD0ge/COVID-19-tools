@@ -6,7 +6,7 @@ import numpy as np
 
 class CustomOverviewGraph:
     def __init__(self, df, geodata):
-        self.russian_regions = df
+        self.regions_df = df
         self.geodata = geodata
 
     def get_pop_map(self, data, date="2020-04-20"):
@@ -15,7 +15,7 @@ class CustomOverviewGraph:
             locations=local_data["geoname_code"],
             geojson=self.geodata,
             text=[
-                self.russian_regions.loc[x, "name_with_type"]
+                self.regions_df.loc[x, "name_with_type"]
                 for x in local_data["region"].values
             ],
             hoverinfo="all",
@@ -31,7 +31,7 @@ class CustomOverviewGraph:
         bar_data = bar_data.sort_values(by=key)[-15:]
         return go.Bar(
             text=[
-                self.russian_regions.loc[x, "name_with_type"]
+                self.regions_df.loc[x, "name_with_type"]
                 for x in bar_data["region"].values
             ],
             y=bar_data[key].apply(lambda x: np.log10(x)),
@@ -136,7 +136,7 @@ class CustomOverviewGraph:
 
         data = data.query('date > "2020-03-20"').reset_index().copy()
         data["pop"] = data["region"].apply(
-            lambda x: self.russian_regions.loc[x, "population"]
+            lambda x: self.regions_df.loc[x, "population"]
         )
         data["confirmed_pop"] = 100 * data[key] / data["pop"]
         fig.add_trace(self.get_dynamic(data, key), 1, 1)
