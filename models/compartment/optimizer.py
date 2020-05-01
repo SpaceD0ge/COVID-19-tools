@@ -136,6 +136,8 @@ class CompartmentalOptimizer:
     def fit(self, cases, deaths, population):
         initial_guess = [x[0] for x in self.states.values()]
         bounds = [x[1] for x in self.states.values()]
+        cases = [int(x) for x in cases]
+        deaths = [int(x) for x in deaths]
 
         def constraint(x):
             return x[3] - x[4]
@@ -154,5 +156,7 @@ class CompartmentalOptimizer:
         return result
 
     def predict(self, params, cases, deaths, population, horizon=10):
+        cases = [int(x) for x in cases]
+        deaths = [int(x) for x in deaths]
         predicted = self.model_fn(params, cases, deaths, population, horizon)
         return predicted
