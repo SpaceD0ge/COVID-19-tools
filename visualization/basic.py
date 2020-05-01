@@ -72,7 +72,6 @@ def plot_cases_map(
     date=None,
 ):
     data["geoname_code"] = data[group]
-
     if date is None:
         date = data["date"].max()
     local_data = data.query(f'date == "{date}"').copy()
@@ -93,7 +92,7 @@ def plot_cases_map(
 
 
 def plot_region_dynamic(data, region_code, key="confirmed", group="region_name"):
-    bar_data = data.set_index(group).loc[region_code].query(f"{key} > 5")
+    bar_data = data.reset_index().set_index(group).loc[region_code].query(f"{key} > 5")
     fig = go.Figure(
         [
             go.Bar(x=bar_data["date"], y=bar_data[key], name="cumulative"),
@@ -141,9 +140,7 @@ def plot_map_difference(
     mtype="choropleth",
     center=None,
 ):
-    data["geoname_code"] = data[group]
-
-    agg = scores.reset_index().groupby("geoname_code").mean()
+    agg = scores.reset_index().groupby(group).mean()
     if by_source:
         agg["best"] = agg.apply(lambda x: np.argmin(x), 1)
         agg.reset_index(inplace=True)
@@ -159,7 +156,6 @@ def plot_map_difference(
         animation = "source"
         title = "Comparing different predictions by region error values"
         scale = px.colors.sequential.Reds
-
     fig = plot_map(
         agg, title, key,
         scale,
