@@ -1,7 +1,19 @@
-convention: iso_alpha3
-countries: ./countries.csv
 root: ./report_files
 reload: false
+auxiliary:
+  {
+    convention: iso_alpha3,
+    countries: ./auxiliary_files/countries.csv,
+    regions: ./auxiliary_files/russia_regions.csv,
+    geojson: ./auxiliary_files/gadm36_RUS_1.json,
+  }
+rospotreb:
+  {
+    rospotreb_page: 'https://www.rospotrebnadzor.ru/',
+    timeseries_page: 'https://github.com/grwlf/COVID-19_plus_Russia/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_RU.csv',
+    rewrite: true,
+    root: ./report_files
+  }
 csse: 
   {
     global_confirmed: 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
@@ -12,15 +24,13 @@ csse:
   }
 google:
   {
-    link_end: _Mobility_Report_en.pdf,
-    link_start: 'https://www.gstatic.com/covid19/mobility/',
-    main_page_url: 'https://www.google.com/covid19/mobility/',
+    main_page_url: 'https://www.gstatic.com/covid19/mobility/Global_Mobility_Report.csv',
     rewrite: true,
     root: ./report_files
   }
 oxford: 
   {
-    main_page_url: 'https://ocgptweb.azurewebsites.net/CSVDownload',
+    main_page_url: 'https://oxcgrtportal.azurewebsites.net/api/CSVDownload',
     rewrite: true,
     root: ./report_files
   }

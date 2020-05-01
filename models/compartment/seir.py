@@ -23,10 +23,14 @@ class SEIR_HCD:
 
     def _hospitalized(
         self,
-        I, C, H,
+        I,
+        C,
+        H,
         infectious_period,
-        time_in_hospital, time_critical,
-        mild_fraction, fatal_fraction
+        time_in_hospital,
+        time_critical,
+        mild_fraction,
+        fatal_fraction,
     ):
         return (
             ((1 - mild_fraction) * (I / infectious_period))
@@ -39,10 +43,12 @@ class SEIR_HCD:
 
     def _recovered(
         self,
-        I, H,
+        I,
+        H,
         infectious_period,
         time_in_hospital,
-        mild_fraction, critical_fraction
+        mild_fraction,
+        critical_fraction,
     ):
         return (mild_fraction * I / infectious_period) + (1 - critical_fraction) * (
             H / time_in_hospital
@@ -53,11 +59,16 @@ class SEIR_HCD:
 
     def model(
         self,
-        time_step, y,
+        time_step,
+        y,
         R_t,
-        incubation_period=2.9, infectious_period=5.2,
-        time_in_hospital=4, time_critical=14,
-        mild_fraction=0.8, critical_fraction=0.1, fatal_fraction=0.3
+        incubation_period=2.9,
+        infectious_period=5.2,
+        time_in_hospital=4,
+        time_critical=14,
+        mild_fraction=0.8,
+        critical_fraction=0.1,
+        fatal_fraction=0.3,
     ):
         if callable(R_t):
             R_t = R_t(time_step)
@@ -71,10 +82,14 @@ class SEIR_HCD:
             I, H, infectious_period, time_in_hospital, mild_fraction, critical_fraction
         )
         H_out = self._hospitalized(
-            I, C, H,
+            I,
+            C,
+            H,
             infectious_period,
-            time_in_hospital, time_critical,
-            mild_fraction, fatal_fraction
+            time_in_hospital,
+            time_critical,
+            mild_fraction,
+            fatal_fraction,
         )
         C_out = self._critical(H, C, time_in_hospital, time_critical, critical_fraction)
         D_out = self._dead(C, time_critical, fatal_fraction)

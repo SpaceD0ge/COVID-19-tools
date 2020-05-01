@@ -32,16 +32,16 @@ with open('file_cfg.yml') as f:
 # cfg['reload'] = True
 
 data = DatasetManager(cfg).get_data()
-assert(list(data.keys()) == ['by_country', 'by_date'])
+assert(list(data.keys()) == ['world', 'russia'])
 ```
 
 Or get reports separately:
 ```python
-from data import GoogleParser, CSSEParser, OxfordParser
+from data import CSSEParser, OxfordParser, RussianRegionsParser
 parsers = [
-	GoogleParser(cfg['google']),
 	CSSEParser(cfg['csse']),
-	OxfordParser(cfg['oxford'])
+	OxfordParser(cfg['oxford']),
+	RussianRegionsParser(cfg[rospotreb], cfg['auxiliary'])
 ]
 data = [parser.load_data() for parser in parsers]
 ```

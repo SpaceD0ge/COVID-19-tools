@@ -3,6 +3,7 @@ from models import CompartmentalOptimizer
 from models.selection import model_per_country_simple_split
 import pandas as pd
 import pytest
+from yaml import BaseLoader
 import yaml
 
 
@@ -10,8 +11,8 @@ import yaml
 def config():
     print("loading config")
     with open("./file_cfg.yml") as f:
-        config = yaml.load(f)
-    return config
+        cfg = yaml.load(f, BaseLoader)
+    return cfg
 
 
 @pytest.fixture(scope="class")
@@ -22,10 +23,10 @@ def manager(config):
 
 
 @pytest.fixture(scope="class")
-def date_data(manager):
+def world_data(manager):
     print("loading date dataframe")
     frames = manager.get_data()
-    frame = frames["by_date"].set_index("country_code")
+    frame = frames["world"]["by_date"].set_index("country_code")
     return frame
 
 
@@ -33,7 +34,7 @@ def date_data(manager):
 def population(manager):
     print("loading country dataframe")
     frames = manager.get_data()
-    frame = frames["by_country"].set_index("country_code")["population"]
+    frame = frames["world"]["by_country"].set_index("country_code")["population"]
     return frame
 
 
@@ -47,14 +48,14 @@ class Test_model:
     @pytest.mark.parametrize(
         "country_code, start, end, result, r_0",
         [
-            ("DEU", "2020-01-27", "2020-04-11", 0.001577, 3.7513),
-            ("RUS", "2020-01-31", "2020-04-11", 0.028109, 3.7446),
+            ("DEU", "2020-02-14", "2020-04-11", 0.139088, 1.8667),
+            ("RUS", "2020-02-14", "2020-04-11", 0.081678, 3.6332),
         ],
     )
     def test_compartment_with_dataframe(
-        self, optimizer, date_data, population, country_code, start, end, result, r_0
+        self, optimizer, world_data, population, country_code, start, end, result, r_0
     ):
-        country = date_data.loc[country_code]
+        country = world_data.loc[country_code]
         mask = (country["date"] >= start) & (country["date"] <= end)
         cases = country[mask]["cases"].values
         deaths = country[mask]["deaths"].values
@@ -86,10 +87,8 @@ class Test_model:
         assert round(res.fun, 6) == result
         assert round(res.x[0], 4) == r_0
 
-    def test_splits(self, date_data):
-        codes = set(date_data.index.unique())
-        splits = model_per_country_simple_split(
-            date_data, targets=["cases", "deaths"]
-        )
+    def test_splits(self, world_data):
+        codes = set(world_data.index.unique())
+        splits = model_per_country_simple_split(world_data, targets=["cases", "deaths"])
         country_codes_alpha3 = set([x for x, y in splits])
         assert codes == country_codes_alpha3
