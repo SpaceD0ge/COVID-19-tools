@@ -25,23 +25,26 @@ from data import DatasetManager
 import yaml
 
 with open('file_cfg.yml') as f:
-    cfg = yaml.load(f)
+    cfg = yaml.safe_load(f)
 
 # to get up to date data from online sources each time
 # uncomment the next part:
 # cfg['reload'] = True
 
+with open(cfg['auxiliary']['geojson']) as f:
+    geodata = json.load(f)
 data = DatasetManager(cfg).get_data()
-assert(list(data.keys()) == ['world', 'russia'])
+
+assert list(data.keys()) == ['world', 'russia']
 ```
 
 Or get reports separately:
 ```python
-from data import CSSEParser, OxfordParser, RussianRegionsParser
+from data import CSSEParser, OxfordParser, GoogleParser
 parsers = [
-	CSSEParser(cfg['csse']),
-	OxfordParser(cfg['oxford']),
-	RussianRegionsParser(cfg[rospotreb], cfg['auxiliary'])
+	CSSEParser(cfg),
+	OxfordParser(cfg),
+	GoogleParser(cfg)
 ]
 data = [parser.load_data() for parser in parsers]
 ```
@@ -51,6 +54,9 @@ Train a SEIR model approximation per country:
 from models import CompartmentalOptimizer
 
 optimizer = CompartmentalOptimizer(optim_days=14)
+cases = [1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 7, 7, 8, 9, 10, 13]
+deaths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2]
+population = 397628
 result = optimizer.fit(cases, deaths, population)
 ```
 

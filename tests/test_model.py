@@ -3,7 +3,6 @@ from models import CompartmentalOptimizer
 from models.selection import model_per_country_simple_split
 import pandas as pd
 import pytest
-from yaml import BaseLoader
 import yaml
 
 
@@ -11,7 +10,7 @@ import yaml
 def config():
     print("loading config")
     with open("./file_cfg.yml") as f:
-        cfg = yaml.load(f, BaseLoader)
+        cfg = yaml.safe_load(f)
     return cfg
 
 

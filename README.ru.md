@@ -24,23 +24,27 @@ from data import DatasetManager
 import yaml
 
 with open('file_cfg.yml') as f:
-    cfg = yaml.load(f)
+    cfg = yaml.safe_load(f)
 
 # чтобы собрать свежие данные, нужно раскомментировать
 # следующую строку:
 # cfg['reload'] = True
 
+with open(cfg['auxiliary']['geojson']) as f:
+    geodata = json.load(f)
 data = DatasetManager(cfg).get_data()
-assert(list(data.keys()) == ['world', 'russia'])
+
+assert list(data.keys()) == ['world', 'russia']
 ```
 
 Или получить отчеты отдельно:
 ```python
-from data import CSSEParser, OxfordParser, RussianRegionsParser
+from data import CSSEParser, OxfordParser, GoogleParser, RussianRegionsParser
 parsers = [
-	CSSEParser(cfg['csse']),
-	OxfordParser(cfg['oxford']),
-	RussianRegionsParser(cfg[rospotreb], cfg['auxiliary'])
+	CSSEParser(cfg),
+	OxfordParser(cfg),
+	GoogleParser(cfg),
+	RussianRegionsParser(cfg)
 ]
 data = [parser.load_data() for parser in parsers]
 ```
@@ -50,6 +54,9 @@ data = [parser.load_data() for parser in parsers]
 from models import CompartmentalOptimizer
 
 optimizer = CompartmentalOptimizer(optim_days=14)
+cases = [1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 7, 7, 8, 9, 10, 13]
+deaths = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2]
+population = 397628
 result = optimizer.fit(cases, deaths, population)
 ```
 или следуя примерам из папки

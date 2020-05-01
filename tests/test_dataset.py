@@ -1,5 +1,4 @@
 import yaml
-from yaml import BaseLoader
 from data import DatasetManager
 import pytest
 import pandas as pd
@@ -9,7 +8,7 @@ import pandas as pd
 def config():
     print("loading config")
     with open("./file_cfg.yml") as f:
-        cfg = yaml.load(f, BaseLoader)
+        cfg = yaml.safe_load(f)
     cfg["reload"] = True
     return cfg
 
