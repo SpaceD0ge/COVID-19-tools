@@ -30,7 +30,7 @@ def plot_errors(scores, summary, source_id=None, graph_type="map", geodata=None,
             margin={"r":0,"t":0,"l":0,"b":2}
         )
         return fig
-    elif graph_type == "pie":
+    if graph_type == "pie":
         err = region_errors.sort_values(by="error", ascending=False).copy()
         err = err[:15].append(
             pd.DataFrame([["OTHER", "", err[15:]["error"].sum()]], columns=err.columns)
