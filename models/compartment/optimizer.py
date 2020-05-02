@@ -6,16 +6,16 @@ import numpy as np
 
 
 DEFAULT_STATES = {
-    "R_0": [3.6, (1, 4)],
-    "time_incubation": [5, (2, 10)],
-    "time_infectious": [2, (1.5, 16)],
-    "time_in_hospital": [4, (2, 10)],
-    "time_critical": [10, (1, 20)],
-    "mild_fraction": [0.8, (0.6, 0.95)],
-    "critical_fraction": [0.1, (0.05, 0.65)],
-    "fatal_fraction": [0.2, (0.01, 0.65)],
-    "k": [2, (1, 10)],
-    "L": [50, (1, 200)],
+    "R_0": [2, (1, 7)],
+    "time_incubation": [2, (2, 15)],
+    "time_infectious": [1.5, (1.5, 16)],
+    "time_in_hospital": [2, (2, 10)],
+    "time_critical": [1, (1, 20)],
+    "mild_fraction": [0, (0, 0.95)],
+    "critical_fraction": [0, (0.05, 0.65)],
+    "fatal_fraction": [0, (0.01, 0.65)],
+    "k": [2, (1, 100)],
+    "L": [2, (1, 200)],
 }
 
 
@@ -67,7 +67,8 @@ class CompartmentalModel:
         msle_fat = mean_squared_log_error(
             data_deaths[-optim_days:], pred_fatal[-optim_days:], weights
         )
-        return np.mean([msle_cases, msle_fat]), (pred_cases, pred_fatal)
+        score = np.mean([msle_cases*0.75, msle_fat*0.25])
+        return score, (pred_cases, pred_fatal)
 
     def _solve_ode(self, args, population, n_infected, days):
         """
@@ -78,10 +79,7 @@ class CompartmentalModel:
             (population - n_infected) / population,
             0,
             n_infected / population,
-            0,
-            0,
-            0,
-            0,
+            0, 0, 0, 0,
         ]
 
         solution = solve_ivp(
@@ -133,30 +131,39 @@ class CompartmentalOptimizer:
             "L",
         ]
 
-    def fit(self, cases, deaths, population):
-        initial_guess = [x[0] for x in self.states.values()]
+    def fit(self, cases, deaths, population, generate_guesses=None):
+        if generate_guesses is None:
+            initial_guesses = [[x[0] for x in self.states.values()]]
+        else:
+            initial_guesses = [
+                np.linspace(x[1][0], x[1][1], generate_guesses)
+                for x in DEFAULT_STATES.values()
+            ]
+            initial_guesses = np.array(initial_guesses).transpose()
+        
         bounds = [x[1] for x in self.states.values()]
-        cases = [int(x) for x in cases]
-        deaths = [int(x) for x in deaths]
 
         def constraint(x):
             return x[3] - x[4]
 
         cons = NonlinearConstraint(constraint, 1.0, 10.0)
-        result = minimize(
-            self.model_fn,
-            initial_guess,
-            bounds=bounds,
-            constraints=cons,
-            args=(cases, deaths, population, False),
-            method="SLSQP",
-            tol=1e-10,
-            options={"maxiter": 5000},
-        )
-        return result
+        best = (10000, None)
+        for initial_guess in initial_guesses:
+            result = minimize(
+                self.model_fn,
+                initial_guess,
+                bounds=bounds,
+                constraints=cons,
+                args=(cases, deaths, population, False),
+                method="SLSQP",
+                tol=1e-10,
+                options={"maxiter": 5000},
+            )
+            if result.fun < best[0]:
+                best = (result.fun, result)
+
+        return best[1]
 
     def predict(self, params, cases, deaths, population, horizon=10):
-        cases = [int(x) for x in cases]
-        deaths = [int(x) for x in deaths]
         predicted = self.model_fn(params, cases, deaths, population, horizon)
         return predicted

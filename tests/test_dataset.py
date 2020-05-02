@@ -1,5 +1,4 @@
 import yaml
-from yaml import BaseLoader
 from data import DatasetManager
 import pytest
 import pandas as pd
@@ -9,7 +8,7 @@ import pandas as pd
 def config():
     print("loading config")
     with open("./file_cfg.yml") as f:
-        cfg = yaml.load(f, BaseLoader)
+        cfg = yaml.safe_load(f)
     cfg["reload"] = True
     return cfg
 
@@ -46,9 +45,11 @@ class Test_dataset:
     @pytest.mark.parametrize(
         "date, country_code, columns, values",
         [
-            ("2020-03-28", "SWZ", ["c1_school_closing", "cases"], [3.0, 6.0]),
-            ("2020-04-02", "USA", ["deaths", "recovered"], [7024.0, 5367.0]),
-            ("2020-04-05", "RUS", ["cases", "deaths"], [4149.0, 281.0]),
+            ("2020-03-28", "SWZ", ["c1_school_closing", "cases"], [3, 9]),
+            ("2020-04-02", "USA", ["deaths", "cases"], [7921, 243622]),
+            ("2020-04-05", "RUS", ["cases", "deaths"], [5389, 45]),
+            ("2020-04-30", "RUS", ["cases", "deaths"], [106498, 1073]),
+            ("2020-01-22", "AFG", ["cases", "deaths", "c1_school_closing"], [0, 0, 0]),
         ],
     )
     def test_different_dates(self, world_data, date, country_code, columns, values):

@@ -3,7 +3,6 @@ from models import CompartmentalOptimizer
 from models.selection import model_per_country_simple_split
 import pandas as pd
 import pytest
-from yaml import BaseLoader
 import yaml
 
 
@@ -11,7 +10,7 @@ import yaml
 def config():
     print("loading config")
     with open("./file_cfg.yml") as f:
-        cfg = yaml.load(f, BaseLoader)
+        cfg = yaml.safe_load(f)
     return cfg
 
 
@@ -48,8 +47,8 @@ class Test_model:
     @pytest.mark.parametrize(
         "country_code, start, end, result, r_0",
         [
-            ("DEU", "2020-02-14", "2020-04-11", 0.139088, 1.8667),
-            ("RUS", "2020-02-14", "2020-04-11", 0.081678, 3.6332),
+            ("DEU", "2020-02-14", "2020-04-11", 0.000406, 6.1193),
+            ("RUS", "2020-02-14", "2020-04-11", 0.166549, 5.5641),
         ],
     )
     def test_compartment_with_dataframe(
@@ -76,8 +75,8 @@ class Test_model:
                 [1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 5, 7, 7, 8, 9, 10, 13],
                 [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2],
                 397628,
-                0.036675,
-                1.9216,
+                0.00722,
+                3.8471,
             ),
         ],
     )
