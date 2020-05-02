@@ -25,7 +25,7 @@ class RegionMatcher:
 
     def get_matching_regions(self, soup, tag='li'):
         matches = [
-            re.findall("[\d+\.\s]{0,1}(\w+[\s\w+]*)\s-\s(\d+)", x.text)
+            re.findall("[\d+\.\s]{0,1}(\w+[-]{0,1}[\s\w+]*)\s-\s(\d+)", x.text)
             for x in soup.find_all(tag)
         ]
         matches = [x for x in np.array(matches).flatten() if len(x) > 0]
