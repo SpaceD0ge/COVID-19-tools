@@ -23,14 +23,19 @@ class RegionMatcher:
         )
         return x.split()[0]
 
-    def collect_region_update(self, table_soup, region_df):
+    def get_matching_regions(self, soup, tag='li'):
         matches = [
-            re.findall("\d+\.\s+(.*)\s-\s(\d+)", x.text)
-            for x in table_soup.find_all("p")
+            re.findall("[\d+\.\s]{0,1}(\w+[-]{0,1}[\s\w+]*)\s-\s(\d+)", x.text)
+            for x in soup.find_all(tag)
         ]
-        # different formatting every day
         matches = [x for x in np.array(matches).flatten() if len(x) > 0]
         matches = [x[0] if isinstance(x, list) else x for x in matches]
+        return matches
+
+    def collect_region_update(self, table_soup, region_df):
+        matches = self.get_matching_regions(table_soup, 'li')
+        if len(matches) == 0:
+            matches = self.get_matching_regions(table_soup, 'p')
         # to simplified format
         matches = [(x[0].lower(), int(x[1])) for x in matches]
         matches = [(self.get_simplified_region(x[0]), x[1]) for x in matches]

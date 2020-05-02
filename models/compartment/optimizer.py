@@ -11,11 +11,11 @@ DEFAULT_STATES = {
     "time_infectious": [1.5, (1.5, 16)],
     "time_in_hospital": [2, (2, 10)],
     "time_critical": [1, (1, 20)],
-    "mild_fraction": [0, (0, 0.95)],
+    "mild_fraction": [0.5, (0.5, 0.95)],
     "critical_fraction": [0, (0.05, 0.65)],
     "fatal_fraction": [0, (0.01, 0.65)],
-    "k": [2, (1, 100)],
-    "L": [2, (1, 200)],
+    "k": [2, (1, 10)],
+    "L": [2, (1, 100)],
 }
 
 
