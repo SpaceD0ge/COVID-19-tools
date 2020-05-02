@@ -1,8 +1,9 @@
 import plotly.express as px
 import plotly.graph_objects as go
+import pandas as pd
 
 
-def plot_errors(scores, summary, source_id=None, graph_type="map", geodata=None):
+def plot_errors(scores, summary, source_id=None, graph_type="map", geodata=None, height=450):
     region_errors = scores.reset_index().groupby(["region_code", "geoname_code"]).sum()
     if source_id is None:
         region_errors = region_errors.sum(1)
@@ -23,8 +24,10 @@ def plot_errors(scores, summary, source_id=None, graph_type="map", geodata=None)
         )
         fig.update_layout(
             mapbox_style="carto-positron",
-            mapbox_zoom=1,
+            mapbox_zoom=0.8,
             mapbox_center={"lat": 61.5, "lon": 105},
+            height=height,
+            margin={"r":0,"t":0,"l":0,"b":2}
         )
         return fig
     elif graph_type == "pie":
@@ -42,7 +45,7 @@ def plot_errors(scores, summary, source_id=None, graph_type="map", geodata=None)
 
 
 def plot_predictions(
-    predictions, names, data_source, group="region", value="RU-MOW", key="confirmed"
+    predictions, names, data_source, group="region", value="RU-MOW", key="confirmed", height=None
 ):
     local_data = data_source.reset_index()
     local_data = local_data.query(f'date > "{local_data["date"].values[-12]}"')
@@ -74,4 +77,6 @@ def plot_predictions(
             )
         )
     fig.update_layout(title=title)
+    if height is not None:
+        fig.update_layout(height=height)
     return fig
