@@ -128,6 +128,8 @@ class RussianRegionsParser:
         )
         update.set_index("region", inplace=True)
         original_prev = original.query(f'date == "{date}"')
+        if original_prev.shape[0] == '0':
+            raise ValueError(f'No "{date}" date in the timeseries data')
         update["confirmed"] = original_prev["confirmed"] + update["confirmed"]
         # fill missing values
         for region_code in original.index.unique():
