@@ -84,9 +84,9 @@ class Test_dataset:
 
     def test_dataframe_integrity(self, dataframe):
         assert list(dataframe.keys()) == ['world', 'russia']
-        world_timeline = data['world']['by_date']
+        world_timeline = dataframe['world']['by_date']
         for date in world_timeline['date'].unique():
             assert world_timeline[world_timeline['date'] == date].shape[0] == data['world']['by_country'].shape[0]
-        rus_timeline = data['russia']['by_date']
+        rus_timeline = dataframe['russia']['by_date']
         for date in rus_timeline['date'].unique():
             assert rus_timeline[rus_timeline['date'] == date].shape[0] == data['russia']['by_region'].shape[0]
