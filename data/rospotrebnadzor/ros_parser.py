@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
+import warnings
 import requests
 import pandas as pd
 import re
@@ -125,8 +126,11 @@ class RussianRegionsParser:
         )
         update.set_index("region", inplace=True)
         original_prev = original.query(f'date == "{date}"')
-        if original_prev.shape[0] == "0":
-            raise ValueError(f'No "{date}" date in the timeseries data')
+        if original_prev.shape[0] == 0:
+            warnings.warn(
+                "Original timeseries source lags two days behind latest rospotrebnadzor update. Returning original."
+            )
+            return original
         update["confirmed"] = original_prev["confirmed"] + update["confirmed"]
         # fill missing values
         for region_code in original.index.unique():

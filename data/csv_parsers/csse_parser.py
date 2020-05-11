@@ -12,9 +12,10 @@ class CSSEParser:
         ]
 
     def _compose(self, frames):
+        frames = [frame.groupby("Country/Region").sum() for frame in frames]
         frames = [
             pd.melt(
-                frame.drop(["Province/State", "Lat", "Long"], 1),
+                frame.drop(["Lat", "Long"], 1).reset_index(),
                 id_vars=["Country/Region"],
                 var_name="date",
                 value_name="val",
