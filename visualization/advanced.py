@@ -34,7 +34,7 @@ class CustomOverviewGraph:
                 self.regions_df.loc[x, "name_with_type"]
                 for x in bar_data["region"].values
             ],
-            y=bar_data[key].apply(lambda x: np.log10(x)),
+            y=bar_data[key].apply(np.log10),
             textposition="inside",
             showlegend=False,
             yaxis="y2",
@@ -83,24 +83,32 @@ class CustomOverviewGraph:
         return [
             dict(
                 text="% населения с подтвержденным заражением для областей России",
-                bgcolor="black", bordercolor="black", borderwidth=1,
+                bgcolor="black",
+                bordercolor="black",
+                borderwidth=1,
                 showarrow=False,
-                xref="paper", yref="paper",
-                x=1, y=1,
+                xref="paper",
+                yref="paper",
+                x=1,
+                y=1,
             ),
             dict(
                 text="Заражений по дням",
                 showarrow=False,
                 textangle=90,
-                xref="paper", yref="paper",
-                x=0.4, y=1,
+                xref="paper",
+                yref="paper",
+                x=0.4,
+                y=1,
             ),
             dict(
                 text="Log шкала заражений",
                 showarrow=False,
                 textangle=90,
-                xref="paper", yref="paper",
-                x=0.4, y=0.05,
+                xref="paper",
+                yref="paper",
+                x=0.4,
+                y=0.05,
             ),
         ]
 

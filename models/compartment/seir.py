@@ -60,20 +60,20 @@ class SEIR_HCD:
     def model(
         self,
         time_step,
-        y,
+        compartments,
         R_t,
-        incubation_period=2.9,
-        infectious_period=5.2,
+        incubation_period=7,
+        infectious_period=5,
         time_in_hospital=4,
-        time_critical=14,
+        time_critical=7,
         mild_fraction=0.8,
         critical_fraction=0.1,
-        fatal_fraction=0.3,
+        fatal_fraction=0.2,
     ):
         if callable(R_t):
             R_t = R_t(time_step)
 
-        S, E, I, R, H, C, D = y
+        S, E, I, R, H, C, D = compartments
 
         S_out = self._susceptible(S, I, R_t, infectious_period)
         E_out = self._exposed(S, E, I, R_t, infectious_period, incubation_period)
