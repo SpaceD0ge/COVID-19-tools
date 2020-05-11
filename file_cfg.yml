@@ -14,7 +14,7 @@ rospotreb:
     rewrite: true,
     root: ./report_files
   }
-csse: 
+csse:
   {
     global_confirmed: 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv',
     global_deaths: 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv',
@@ -28,7 +28,7 @@ google:
     rewrite: true,
     root: ./report_files
   }
-oxford: 
+oxford:
   {
     main_page_url: 'https://oxcgrtportal.azurewebsites.net/api/CSVDownload',
     rewrite: true,
