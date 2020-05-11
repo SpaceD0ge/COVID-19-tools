@@ -1,9 +1,7 @@
-import json
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 import requests
 import pandas as pd
-import numpy as np
 import re
 
 
@@ -23,21 +21,20 @@ class RegionMatcher:
         )
         return x.split()[0]
 
-    def get_matching_regions(self, soup, tag='li'):
+    def get_matching_regions(self, soup, tag="li"):
         matches = [
-            re.findall("[\d+\.\s]{0,1}(\w+[-]{0,1}[\s\w+]*)\s-\s(\d+)", x.text)
-            for x in soup.find_all(tag)
+            re.match("(\d+\.\s){0,1}(.*)\s-\s(\d+)", x.text) for x in soup.find_all(tag)
         ]
-        matches = [x for x in np.array(matches).flatten() if len(x) > 0]
-        matches = [x[0] if isinstance(x, list) else x for x in matches]
+        matches = [
+            [x.group(2).lower(), int(x.group(3))] for x in matches if x is not None
+        ]
         return matches
 
     def collect_region_update(self, table_soup, region_df):
-        matches = self.get_matching_regions(table_soup, 'li')
+        matches = self.get_matching_regions(table_soup, "li")
         if len(matches) == 0:
-            matches = self.get_matching_regions(table_soup, 'p')
+            matches = self.get_matching_regions(table_soup, "p")
         # to simplified format
-        matches = [(x[0].lower(), int(x[1])) for x in matches]
         matches = [(self.get_simplified_region(x[0]), x[1]) for x in matches]
         # extracting iso codes
         iso_codes = region_df.set_index("name")["iso_code"].to_dict()
@@ -128,7 +125,7 @@ class RussianRegionsParser:
         )
         update.set_index("region", inplace=True)
         original_prev = original.query(f'date == "{date}"')
-        if original_prev.shape[0] == '0':
+        if original_prev.shape[0] == "0":
             raise ValueError(f'No "{date}" date in the timeseries data')
         update["confirmed"] = original_prev["confirmed"] + update["confirmed"]
         # fill missing values

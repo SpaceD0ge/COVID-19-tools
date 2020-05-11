@@ -1,7 +1,6 @@
 from data import DatasetManager
 from models import CompartmentalOptimizer
 from models.selection import model_per_country_simple_split
-import pandas as pd
 import pytest
 import yaml
 
@@ -89,5 +88,5 @@ class Test_model:
     def test_splits(self, world_data):
         codes = set(world_data.index.unique())
         splits = model_per_country_simple_split(world_data, targets=["cases", "deaths"])
-        country_codes_alpha3 = set([x for x, y in splits])
+        country_codes_alpha3 = {x for x, y in splits}
         assert codes == country_codes_alpha3

@@ -41,12 +41,12 @@ class CompartmentalModel:
         args = (time_varying_reproduction,) + tuple(params[1:-2])
         return args
 
-    def _get_predictions(self, sol, population):
+    def _get_predictions(self, solution, population):
         """
         Returns predictions of confirmed cases and fatalities.
         Original solution values are measured in fractions of population.
         """
-        sus, exp, inf, rec, hosp, crit, deaths = sol.y
+        _, _, inf, rec, hosp, crit, deaths = solution.y
         pred_cases = np.clip(inf + rec + hosp + crit + deaths, 0, np.inf) * population
         pred_fatal = np.clip(deaths, 0, np.inf) * population
         return pred_cases, pred_fatal
@@ -67,7 +67,7 @@ class CompartmentalModel:
         msle_fat = mean_squared_log_error(
             data_deaths[-optim_days:], pred_fatal[-optim_days:], weights
         )
-        score = np.mean([msle_cases*0.75, msle_fat*0.25])
+        score = np.mean([msle_cases * 0.75, msle_fat * 0.25])
         return score, (pred_cases, pred_fatal)
 
     def _solve_ode(self, args, population, n_infected, days):
@@ -118,7 +118,7 @@ class CompartmentalOptimizer:
         self.states = parameter_states
         if parameter_states is None:
             self.states = DEFAULT_STATES
-        assert list(self.states.keys()) == [
+        if list(self.states.keys()) != [
             "R_0",
             "time_incubation",
             "time_infectious",
@@ -129,7 +129,8 @@ class CompartmentalOptimizer:
             "fatal_fraction",
             "k",
             "L",
-        ]
+        ]:
+            raise ValueError("Wrong state keys")
 
     def fit(self, cases, deaths, population, generate_guesses=None):
         if generate_guesses is None:
@@ -140,7 +141,7 @@ class CompartmentalOptimizer:
                 for x in DEFAULT_STATES.values()
             ]
             initial_guesses = np.array(initial_guesses).transpose()
-        
+
         bounds = [x[1] for x in self.states.values()]
 
         def constraint(x):

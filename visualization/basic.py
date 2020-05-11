@@ -4,7 +4,9 @@ import numpy as np
 
 
 def plot_map(
-    data, title, color_key,
+    data,
+    title,
+    color_key,
     color_scale,
     geodata=None,
     hover_name=None,
@@ -15,7 +17,7 @@ def plot_map(
 ):
     if map_class == "choropleth":
         map_figure = px.choropleth
-    elif map_class == "choropleth_mapbox" or map_class == "mapbox":
+    elif map_class in ("choropleth_mapbox", "mapbox"):
         map_figure = px.choropleth_mapbox
     else:
         raise ValueError(f"Wrong map type {map_class}")
@@ -51,7 +53,7 @@ def plot_country_dynamic(
 ):
     if start:
         data = data.query(f'date > "{start}"')
-    if clip:
+    if clip is not None and isinstance(clip, int):
         date = data["date"].max()
         selected = data[data["date"] == date].sort_values(by="cases")[-clip:][group]
         data = data.set_index(group).loc[selected].reset_index()
@@ -83,7 +85,9 @@ def plot_cases_map(
     title = f"Confirmed cases by region by {date}. {postfix}"
 
     return plot_map(
-        local_data, title, key,
+        local_data,
+        title,
+        key,
         px.colors.sequential.tempo,
         geodata=geojson,
         map_class=mtype,
@@ -119,7 +123,7 @@ def plot_simple_difference(
         return px.line(
             aggregate, x=group, y="log_error", color="source_id", title=title
         )
-    elif graph_type == "bar":
+    if graph_type == "bar":
         return px.bar(
             aggregate,
             x=group,
@@ -128,8 +132,7 @@ def plot_simple_difference(
             barmode="group",
             title=title,
         )
-    else:
-        raise ValueError(f"Wrong graph type {graph_type}")
+    raise ValueError(f"Wrong graph type {graph_type}")
 
 
 def plot_map_difference(
@@ -142,12 +145,12 @@ def plot_map_difference(
 ):
     agg = scores.reset_index().groupby(group).mean()
     if by_source:
-        agg["best"] = agg.apply(lambda x: np.argmin(x), 1)
+        agg["best"] = agg.apply(np.argmin, 1)
         agg.reset_index(inplace=True)
         key = "best"
         animation = None
         title = "Comparing different predictions by best index"
-        scale = color_continuous_scale = px.colors.sequential.Rainbow
+        scale = px.colors.sequential.Rainbow
     else:
         agg = agg.reset_index().melt(
             id_vars=["geoname_code"], var_name="source", value_name="error"
@@ -157,7 +160,9 @@ def plot_map_difference(
         title = "Comparing different predictions by region error values"
         scale = px.colors.sequential.Reds
     fig = plot_map(
-        agg, title, key,
+        agg,
+        title,
+        key,
         scale,
         animation_frame=animation,
         geodata=geojson,
