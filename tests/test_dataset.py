@@ -62,12 +62,18 @@ class Test_dataset:
         "country_code, start, end, column, changes",
         [
             (
-                "DEU", "2020-03-11", "2020-03-19",
-                "retail_and_recreation_percent_change_from_baseline", [0, 0, 1, 1, 0, 0, 0]
+                "DEU",
+                "2020-03-11",
+                "2020-03-19",
+                "retail_and_recreation_percent_change_from_baseline",
+                [0, 0, 1, 1, 0, 0, 0],
             ),
             (
-                "ITA", "2020-03-09", "2020-03-17",
-                "parks_percent_change_from_baseline", [0, 0, 0, 0, 0, 1, 0]
+                "ITA",
+                "2020-03-09",
+                "2020-03-17",
+                "parks_percent_change_from_baseline",
+                [0, 0, 0, 0, 0, 1, 0],
             ),
         ],
     )
@@ -83,10 +89,16 @@ class Test_dataset:
         assert codes == country_codes_alpha3
 
     def test_dataframe_integrity(self, dataframe):
-        assert list(dataframe.keys()) == ['world', 'russia']
-        world_timeline = dataframe['world']['by_date']
-        for date in world_timeline['date'].unique():
-            assert world_timeline[world_timeline['date'] == date].shape[0] == data['world']['by_country'].shape[0]
-        rus_timeline = dataframe['russia']['by_date']
-        for date in rus_timeline['date'].unique():
-            assert rus_timeline[rus_timeline['date'] == date].shape[0] == data['russia']['by_region'].shape[0]
+        assert list(dataframe.keys()) == ["world", "russia"]
+        world_timeline = dataframe["world"]["by_date"]
+        for date in world_timeline["date"].unique():
+            assert (
+                world_timeline[world_timeline["date"] == date].shape[0]
+                == dataframe["world"]["by_country"].shape[0]
+            )
+        rus_timeline = dataframe["russia"]["by_date"]
+        for date in rus_timeline["date"].unique():
+            assert (
+                rus_timeline[rus_timeline["date"] == date].shape[0]
+                == dataframe["russia"]["by_region"].shape[0]
+            )
