@@ -7,7 +7,6 @@ import yaml
 
 @pytest.fixture(scope="class")
 def config():
-    print("loading config")
     with open("./file_cfg.yml") as f:
         cfg = yaml.safe_load(f)
     return cfg
@@ -15,14 +14,12 @@ def config():
 
 @pytest.fixture(scope="class")
 def manager(config):
-    print("loading manager")
     manager = DatasetManager(config)
     return manager
 
 
 @pytest.fixture(scope="class")
 def world_data(manager):
-    print("loading date dataframe")
     frames = manager.get_data()
     frame = frames["world"]["by_date"].set_index("country_code")
     return frame
@@ -30,7 +27,6 @@ def world_data(manager):
 
 @pytest.fixture(scope="class")
 def population(manager):
-    print("loading country dataframe")
     frames = manager.get_data()
     frame = frames["world"]["by_country"].set_index("country_code")["population"]
     return frame
@@ -38,7 +34,6 @@ def population(manager):
 
 @pytest.fixture(scope="class")
 def optimizer(manager):
-    print("loading optimizer")
     return CompartmentalOptimizer(optim_days=14)
 
 

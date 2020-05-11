@@ -6,7 +6,6 @@ import pandas as pd
 
 @pytest.fixture(scope="class")
 def config():
-    print("loading config")
     with open("./file_cfg.yml") as f:
         cfg = yaml.safe_load(f)
     cfg["reload"] = True
@@ -15,7 +14,6 @@ def config():
 
 @pytest.fixture(scope="class")
 def country_codes_alpha3(config):
-    print("loading country codes")
     data = pd.read_csv(config["auxiliary"]["countries"])
     data = data["iso_alpha3"].unique()
     return set(data)
@@ -23,22 +21,24 @@ def country_codes_alpha3(config):
 
 @pytest.fixture(scope="class")
 def manager(config):
-    print("loading manager")
     manager = DatasetManager(config)
     return manager
 
 
 @pytest.fixture(scope="class")
 def dataframe(manager):
-    print("loading dataframe")
     frame = manager.get_data()
     return frame
 
 
 @pytest.fixture(scope="class")
 def world_data(dataframe):
-    print("loading date level data")
     return dataframe["world"]["by_date"]
+
+
+@pytest.fixture(scope="class")
+def rus_data(dataframe):
+    return dataframe["russia"]["by_date"]
 
 
 class Test_dataset:
@@ -81,3 +81,12 @@ class Test_dataset:
     def test_country_codes(self, world_data, country_codes_alpha3):
         codes = set(world_data["country_code"].unique())
         assert codes == country_codes_alpha3
+
+    def test_dataframe_integrity(self, dataframe):
+        assert list(dataframe.keys()) == ['world', 'russia']
+        world_timeline = data['world']['by_date']
+        for date in world_timeline['date'].unique():
+            assert world_timeline[world_timeline['date'] == date].shape[0] == data['world']['by_country'].shape[0]
+        rus_timeline = data['russia']['by_date']
+        for date in rus_timeline['date'].unique():
+            assert rus_timeline[rus_timeline['date'] == date].shape[0] == data['russia']['by_region'].shape[0]
