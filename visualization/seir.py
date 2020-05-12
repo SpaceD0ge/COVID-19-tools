@@ -42,8 +42,7 @@ def graph_SEIR(code, opt_result, start_date, data_key="cases", static=False):
     if static:
         img_bytes = img_bytes = fig.to_image(format="png")
         return Image(img_bytes)
-    else:
-        return fig
+    return fig
 
 
 def graph_Rt(code, opt_result, start_date, period=60, static=False):
@@ -79,5 +78,4 @@ def graph_Rt(code, opt_result, start_date, period=60, static=False):
     if static:
         img_bytes = img_bytes = fig.to_image(format="png")
         return Image(img_bytes)
-    else:
-        return fig
+    return fig

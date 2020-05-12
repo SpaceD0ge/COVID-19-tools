@@ -42,8 +42,7 @@ def plot_errors(
         )
         fig = px.pie(err, values="error", names="region", title=title)
         return fig
-    else:
-        raise ValueError(f"Wrong {graph_type} type")
+    raise ValueError(f"Wrong {graph_type} type")
 
 
 def plot_predictions(

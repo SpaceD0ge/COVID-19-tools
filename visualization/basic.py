@@ -49,11 +49,11 @@ def plot_map(
 
 
 def plot_country_dynamic(
-    data, start="2020-03-06", key="confirmed", group="region_name", clip=None
+    data, start="2020-03-06", key="confirmed", group="region_name", clip=0
 ):
     if start:
         data = data.query(f'date > "{start}"')
-    if clip is not None and isinstance(clip, int):
+    if clip > 0:
         date = data["date"].max()
         selected = data[data["date"] == date].sort_values(by="cases")[-clip:][group]
         data = data.set_index(group).loc[selected].reset_index()

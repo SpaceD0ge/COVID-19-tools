@@ -77,6 +77,7 @@ class Test_model:
     def test_compartment_raw(self, optimizer, cases, deaths, pop, result, r_0):
         res = optimizer.fit(cases, deaths, pop)
         pred_cases, pred_dead = optimizer.predict(res.x, cases, deaths, pop, 30)
+        assert len(pred_cases) == len(pred_dead)
         assert round(res.fun, 6) < result
         assert round(res.x[0], 4) == r_0
 
