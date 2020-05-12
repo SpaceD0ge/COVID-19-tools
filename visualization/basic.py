@@ -11,7 +11,7 @@ def plot_map(
     geodata=None,
     hover_name=None,
     animation_frame=None,
-    center={"lat": 61.5, "lon": 105},
+    center=(61.5, 105),
     map_style="carto-positron",
     map_class="choropleth",
 ):
@@ -31,7 +31,7 @@ def plot_map(
         range_color=[data[color_key].min(), data[color_key].max() * 1.3],
         hover_name=hover_name,
         hover_data=[color_key],
-        center=center,
+        center={"lat": center[0], "lon": center[1]},
         color_continuous_scale=color_scale,
     )
 
