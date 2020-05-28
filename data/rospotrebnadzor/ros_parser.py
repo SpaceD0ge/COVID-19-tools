@@ -35,6 +35,11 @@ class RegionMatcher:
         matches = self.get_matching_regions(table_soup, "li")
         if len(matches) == 0:
             matches = self.get_matching_regions(table_soup, "p")
+        if len(matches) == 0:
+            matches = self.get_matching_regions(table_soup, "div")
+        if len(matches) == 0:
+            raise ValueError('Rospotrebnadzor parser is not working\
+            due to an unexpected page formatting change.')
         # to simplified format
         matches = [(self.get_simplified_region(x[0]), x[1]) for x in matches]
         # extracting iso codes

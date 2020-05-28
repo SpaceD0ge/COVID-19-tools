@@ -11,7 +11,7 @@ def plot_map(
     geodata=None,
     hover_name=None,
     animation_frame=None,
-    center={"lat": 61.5, "lon": 105},
+    center=(61.5, 105),
     map_style="carto-positron",
     map_class="choropleth",
 ):
@@ -31,7 +31,7 @@ def plot_map(
         range_color=[data[color_key].min(), data[color_key].max() * 1.3],
         hover_name=hover_name,
         hover_data=[color_key],
-        center=center,
+        center={"lat": center[0], "lon": center[1]},
         color_continuous_scale=color_scale,
     )
 
@@ -49,11 +49,11 @@ def plot_map(
 
 
 def plot_country_dynamic(
-    data, start="2020-03-06", key="confirmed", group="region_name", clip=None
+    data, start="2020-03-06", key="confirmed", group="region_name", clip=0
 ):
     if start:
         data = data.query(f'date > "{start}"')
-    if clip is not None and isinstance(clip, int):
+    if clip > 0:
         date = data["date"].max()
         selected = data[data["date"] == date].sort_values(by="cases")[-clip:][group]
         data = data.set_index(group).loc[selected].reset_index()

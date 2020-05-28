@@ -8,16 +8,14 @@ class Convention:
     def __init__(self, cfg):
         country_code_file = cfg["countries"]
         self.convention = cfg["convention"]
-        conventions = set(
-            [
-                "iso_alpha2",
-                "iso_alpha3",
-                "iso_numeric",
-                "name",
-                "official_name",
-                "ccse_name",
-            ]
-        )
+        conventions = {
+            "iso_alpha2",
+            "iso_alpha3",
+            "iso_numeric",
+            "name",
+            "official_name",
+            "ccse_name",
+        }
         self.converters = {
             code: pd.read_csv(country_code_file, index_col=code).to_dict()
             for code in conventions
@@ -28,12 +26,10 @@ class Convention:
         if country_code.isupper():
             if len(country_code) == 2:
                 return "iso_alpha2"
-            elif len(country_code) == 3:
+            if len(country_code) == 3:
                 return "iso_alpha3"
-            else:
-                raise ValueError(f"Can't find proper convention for {country_code}")
-        else:
-            return "ccse_name"
+            raise ValueError(f"Can't find proper convention for {country_code}")
+        return "ccse_name"
 
     def _convert_code(self, code, from_convention):
         converter = self.converters[from_convention]

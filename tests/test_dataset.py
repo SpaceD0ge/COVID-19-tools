@@ -46,7 +46,7 @@ class Test_dataset:
         "date, country_code, columns, values",
         [
             ("2020-03-28", "SWZ", ["c1_school_closing", "cases"], [3, 9]),
-            ("2020-04-02", "USA", ["deaths", "cases"], [7921, 243622]),
+            ("2020-04-02", "USA", ["deaths", "cases"], [7938, 244008]),
             ("2020-04-05", "RUS", ["cases", "deaths"], [5389, 45]),
             ("2020-04-30", "RUS", ["cases", "deaths"], [106498, 1073]),
             ("2020-01-22", "AFG", ["cases", "deaths", "c1_school_closing"], [0, 0, 0]),
