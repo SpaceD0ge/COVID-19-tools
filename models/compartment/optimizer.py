@@ -62,10 +62,10 @@ class CompartmentalModel:
         weights = 1 / np.arange(1, optim_days + 1)[::-1]
 
         msle_cases = mean_squared_log_error(
-            data_cases[-optim_days:], pred_cases[-optim_days:], weights
+            data_cases[-optim_days:], pred_cases[-optim_days:], sample_weight=weights
         )
         msle_fat = mean_squared_log_error(
-            data_deaths[-optim_days:], pred_fatal[-optim_days:], weights
+            data_deaths[-optim_days:], pred_fatal[-optim_days:], sample_weight=weights
         )
         score = np.mean([msle_cases * 0.75, msle_fat * 0.25])
         return score, (pred_cases, pred_fatal)
