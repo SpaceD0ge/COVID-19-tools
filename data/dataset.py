@@ -29,8 +29,7 @@ class Convention:
             if len(country_code) == 3:
                 return "iso_alpha3"
             raise ValueError(f"Can't find proper convention for {country_code}")
-        else:
-            return "ccse_name"
+        return "ccse_name"
 
     def _convert_code(self, code, from_convention):
         converter = self.converters[from_convention]
